@@ -22,5 +22,6 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include("theatre.urls", namespace="theatre")),
+    path("api/theatre/", include("theatre.urls", namespace="theatre")),
+    path("api/users/", include("users.urls", namespace="users")),
 ] + debug_toolbar_urls()

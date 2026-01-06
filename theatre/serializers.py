@@ -1,5 +1,4 @@
 from django.db import transaction
-from django.template.context_processors import request
 
 from rest_framework import serializers
 
@@ -18,7 +17,7 @@ class ActorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Actor
-        fields = ("id", "first_name", "last_name")
+        fields = ("id", "first_name", "last_name", "full_name")
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -29,15 +28,15 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class PlaySerializer(serializers.ModelSerializer):
-    actors = serializers.PrimaryKeyRelatedField(
+    actors = serializers.SlugRelatedField(
         many=True,
-        queryset=Actor.objects.all(),
-        required=False
+        read_only=True,
+        slug_field="full_name"
     )
-    genres = serializers.PrimaryKeyRelatedField(
+    genres = serializers.SlugRelatedField(
         many=True,
-        queryset=Genre.objects.all(),
-        required=False
+        read_only=True,
+        slug_field="name"
     )
 
     class Meta:
@@ -59,10 +58,12 @@ class TheatreHallSerializer(serializers.ModelSerializer):
 
 
 class PerformanceSerializer(serializers.ModelSerializer):
+    play_title = serializers.CharField(source="play.title", read_only=True)
+    theatre_hall_name = serializers.CharField(source="theatre_hall.name", read_only=True)
 
     class Meta:
         model = Performance
-        fields = ("id", "play", "theatre_hall", "show_time")
+        fields = ("id", "play_title", "theatre_hall_name", "show_time")
 
 
 class TicketSerializer(serializers.ModelSerializer):
