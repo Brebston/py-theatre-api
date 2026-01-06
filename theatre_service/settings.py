@@ -40,11 +40,16 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "debug_toolbar",
+    "drf_spectacular",
     "theatre",
     "users",
 ]
 
 AUTH_USER_MODEL = "users.User"
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -137,6 +142,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "theatre.permissions.IsAdminOrIfAuthenticatedReadOnly",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle"
@@ -145,6 +151,19 @@ REST_FRAMEWORK = {
         "anon": "100/day",
         "user": "1000/day"
     }
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Theatre Station API",
+    "DESCRIPTION": "Viewing available performances, purchasing theatre tickets",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "defaultmodelRendering": "model",
+        "defaultmodelsExpandDepth": 2,
+        "defaultmodelExpandDepth": 2,
+    },
 }
 
 SIMPLE_JWT = {
