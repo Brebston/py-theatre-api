@@ -13,10 +13,6 @@ class Actor(models.Model):
     def __str__(self) -> str:
         return self.first_name + " " + self.last_name
 
-    @property
-    def full_name(self):
-        return f"{self.first_name} {self.last_name}"
-
 
 class Genre(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -57,7 +53,9 @@ class TheatreHall(models.Model):
 class Performance(models.Model):
     play = models.ForeignKey(Play, on_delete=models.CASCADE, related_name="performances")
     theatre_hall = models.ForeignKey(
-        TheatreHall, on_delete=models.PROTECT, related_name="performances"
+        TheatreHall,
+        on_delete=models.PROTECT,
+        related_name="performances"
     )
     show_time = models.DateTimeField()
 
@@ -77,7 +75,9 @@ class Performance(models.Model):
 class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reservations"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="reservations"
     )
 
     class Meta:
@@ -92,10 +92,14 @@ class Ticket(models.Model):
     seat = models.PositiveIntegerField()
 
     performance = models.ForeignKey(
-        Performance, on_delete=models.CASCADE, related_name="tickets"
+        Performance,
+        on_delete=models.CASCADE,
+        related_name="tickets"
     )
     reservation = models.ForeignKey(
-        Reservation, on_delete=models.CASCADE, related_name="tickets"
+        Reservation,
+        on_delete=models.CASCADE,
+        related_name="tickets"
     )
 
     class Meta:
