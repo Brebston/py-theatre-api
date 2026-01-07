@@ -46,8 +46,16 @@ class PlaySerializer(serializers.ModelSerializer):
             "title",
             "description",
             "actors",
-            "genres"
+            "genres",
+            "image"
         )
+
+
+class PlayImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Play
+        fields = ("id", "image")
 
 
 class TheatreHallSerializer(serializers.ModelSerializer):
