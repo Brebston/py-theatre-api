@@ -1,4 +1,5 @@
 from django.template.context_processors import request
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAdminUser
@@ -40,11 +41,31 @@ class PlayViewSet(viewsets.ModelViewSet):
     queryset = Play.objects.prefetch_related("actors", "genres").all()
     serializer_class = PlaySerializer
 
+    @staticmethod
+    def _params_to_ints(query_string):
+        """Converts a string of format '1,2,3' to a list of integers [1,2,3]."""
+        return [int(str_id) for str_id in query_string.split(",")]
+
     def get_serializer_class(self):
         if self.action == "upload_image":
             return PlayImageSerializer
 
         return PlaySerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+        actors = self.request.query_params.get("actors")
+        genres = self.request.query_params.get("genres")
+        if actors:
+            actors = self._params_to_ints(actors)
+            queryset = queryset.filter(actors__id__in=actors)
+        if genres:
+            genres = self._params_to_ints(genres)
+            queryset = queryset.filter(genres__id__in=genres)
+        if self.action in ("list", "retrieve"):
+            return queryset.prefetch_related("actors", "genres")
+
+        return queryset
 
     @action(
         methods=["POST"],
@@ -60,6 +81,24 @@ class PlayViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "actors",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter by actor id (ex. ?actors=2,3)",
+            ),
+            OpenApiParameter(
+                "genres",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter by genre id (ex. ?genres=2,3)",
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """Get list of buses"""
+        return super().list(request, *args, **kwargs)
 
 
 class TheatreHallViewSet(viewsets.ModelViewSet):
